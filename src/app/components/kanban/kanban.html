@@ -1,5 +1,10 @@
 <div class="kanban">
   <header class="kanban-header">
+    <div class="header-top">
+      <a routerLink="/" class="btn-back" title="Volver a tableros">← Tableros</a>
+      <span class="user-info">{{ auth.user()?.email }}</span>
+      <button type="button" class="btn-logout" (click)="auth.logout()">Cerrar sesión</button>
+    </div>
     <h1>{{ kanbanService.board()?.name ?? 'Tablero Kanban' }}</h1>
   </header>
 
