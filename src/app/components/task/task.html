@@ -1,0 +1,79 @@
+<div class="overlay" (click)="onClose()">
+  <article class="task-card" (click)="stopPropagation($event)">
+    <header class="task-header">
+      <h2>Editar tarea</h2>
+      <button type="button" class="btn-close" (click)="onClose()" aria-label="Cerrar">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+    </header>
+    <form class="task-body" (ngSubmit)="save()">
+      <label>
+        Título
+        <input
+          type="text"
+          [ngModel]="editTitle()"
+          (ngModelChange)="editTitle.set($event)"
+          name="title"
+          placeholder="Título de la tarea"
+        />
+      </label>
+      <label>
+        Descripción
+        <textarea
+          [ngModel]="editDescription()"
+          (ngModelChange)="editDescription.set($event)"
+          name="description"
+          placeholder="Descripción opcional"
+          rows="4"
+        ></textarea>
+      </label>
+      <label>
+        Estado
+        <select [ngModel]="editStatus()" (ngModelChange)="editStatus.set($event)" name="status">
+          @for (opt of statusOptions; track opt.id) {
+            <option [value]="opt.id">{{ opt.label }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Prioridad
+        <select [ngModel]="editPriority()" (ngModelChange)="editPriority.set($event)" name="priority">
+          @for (p of priorityOptions; track p) {
+            <option [value]="p">{{ p }}</option>
+          }
+        </select>
+      </label>
+      <label>
+        Miembros
+        <input
+          type="text"
+          [ngModel]="editMembers()"
+          (ngModelChange)="editMembers.set($event)"
+          name="members"
+          placeholder="Ej: Juan, María, Pedro (separados por coma)"
+        />
+      </label>
+      <label>
+        Horas estimadas
+        <select [ngModel]="editEstimatedHours()" (ngModelChange)="editEstimatedHours.set($event === '' ? '' : +$event)" name="estimatedHours">
+          <option [ngValue]="''">— Sin estimar —</option>
+          @for (h of estimatedHoursOptions; track h) {
+            <option [ngValue]="h">{{ h }} h</option>
+          }
+        </select>
+      </label>
+      <dl class="meta readonly">
+        <dt>Creada</dt>
+        <dd>{{ task().createdAt | date:'medium' }}</dd>
+        <dt>Actualizada</dt>
+        <dd>{{ task().updatedAt | date:'medium' }}</dd>
+      </dl>
+      <div class="actions">
+        <button type="button" class="btn-secondary" (click)="onClose()">Cancelar</button>
+        <button type="submit" class="btn-primary">Guardar</button>
+      </div>
+    </form>
+  </article>
+</div>

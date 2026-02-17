@@ -1,0 +1,128 @@
+<div class="kanban">
+  <header class="kanban-header">
+    <h1>{{ kanbanService.board()?.name ?? 'Tablero Kanban' }}</h1>
+  </header>
+
+  <div class="board">
+    @for (column of columns(); track column.id) {
+      <section
+        class="column"
+        [class]="'column-' + column.id"
+        (drop)="onDrop($event, column.id)"
+        (dragover)="onDragOver($event)"
+      >
+        <div class="column-header">
+          <h2>{{ column.title }}</h2>
+          <button
+            type="button"
+            class="btn-add"
+            (click)="openNewTaskForm(column.id)"
+            title="Añadir tarea"
+          >
+            + Añadir
+          </button>
+        </div>
+        <ul class="task-list">
+          @for (task of column.tasks; track task.id) {
+            <li
+              class="task-item"
+              draggable="true"
+              (dragstart)="onDragStart($event, task)"
+              (click)="selectTask(task)"
+            >
+              <div class="task-item-header">
+                <span class="task-title">{{ task.title }}</span>
+                <button
+                  type="button"
+                  class="btn-delete"
+                  (click)="deleteTask($event, task.id)"
+                  title="Eliminar tarea"
+                  aria-label="Eliminar tarea"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M18 6L6 18M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+              @if (task.description) {
+                <span class="task-preview">{{ task.description.length > 60 ? task.description.slice(0, 60) + '...' : task.description }}</span>
+              }
+              <div class="task-item-meta">
+                @if (task.estimatedHours) {
+                  <span class="badge-hours">{{ task.estimatedHours }}h</span>
+                }
+                @if (task.members?.length) {
+                  <span class="badge-members">{{ task.members!.length }} miembro(s)</span>
+                }
+              </div>
+            </li>
+          } @empty {
+            <li class="empty-hint">Arrastra tareas aquí o haz clic en "Añadir"</li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+
+  @if (showNewTaskForm()) {
+    <div class="modal-overlay" (click)="closeNewTaskForm()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Nueva tarea</h3>
+        <form (ngSubmit)="createTask()">
+          <label>
+            Título
+            <input
+              type="text"
+              [value]="newTitle()"
+              (input)="newTitle.set($any($event.target).value)"
+              placeholder="Título de la tarea"
+              required
+            />
+          </label>
+          <label>
+            Descripción
+            <textarea
+              [value]="newDescription()"
+              (input)="newDescription.set($any($event.target).value)"
+              placeholder="Descripción opcional"
+              rows="3"
+            ></textarea>
+          </label>
+          <label>
+            Miembros
+            <input
+              type="text"
+              [value]="newMembers()"
+              (input)="newMembers.set($any($event.target).value)"
+              placeholder="Ej: Juan, María, Pedro (separados por coma)"
+            />
+          </label>
+          <label>
+            Horas estimadas
+            <select
+              [value]="newEstimatedHours()"
+              (change)="newEstimatedHours.set($any($event.target).value === '' ? '' : +$any($event.target).value)"
+            >
+              <option value="">— Sin estimar —</option>
+              @for (h of estimatedHoursOptions; track h) {
+                <option [value]="h">{{ h }} h</option>
+              }
+            </select>
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeNewTaskForm()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="!newTitle().trim()">
+              Crear
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (selectedTask(); as task) {
+    <app-task [task]="task" (close)="closeTaskDetail()" />
+  }
+</div>
