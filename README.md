@@ -1,10 +1,40 @@
 # KanbanApp
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.1.3.
+Aplicación web para el seguimiento de tareas de equipos usando el método Kanban. Desarrollada con Angular 21.
+
+## Roadmap del proyecto
+
+### Fase 1 (Actual)
+- **Componente Kanban**: Tablero con columnas (Backlog, En proceso, Bloqueado, Hecho, etc.) para crear y mover tareas
+- **Componente Task**: Tarjeta con detalles de cada tarea; se despliega al hacer clic en una tarea desde el tablero
+- Persistencia de datos en **localStorage**
+
+### Fase 2
+- **Componente Lista-Kanbans**: Acceso a múltiples tableros Kanban
+
+### Fase 3
+- Sistema de **usuarios** con autenticación por tokens
+- Base de datos para persistencia
+- Sesión de usuario con sus propios kanbans y datos
+
+---
+
+Proyecto generado con [Angular CLI](https://github.com/angular/angular-cli) v21.1.3.
+
+## Subir a GitHub
+
+1. Crea un nuevo repositorio en [GitHub](https://github.com/new) (sin README ni .gitignore, el proyecto ya los incluye)
+2. Conecta el repositorio local y sube el código:
+
+```bash
+git remote add origin https://github.com/TU_USUARIO/kanban-app.git
+git branch -M main
+git push -u origin main
+```
 
 ## Development server
 
-To start a local development server, run:
+Para iniciar el servidor de desarrollo local:
 
 ```bash
 ng serve
