@@ -10,6 +10,34 @@
   flex-direction: column;
   gap: 0.5rem;
 
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
+  .user-info {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+
+  .btn-logout {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    color: #64748b;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+  }
+
   .btn-back {
     font-size: 0.875rem;
     color: #64748b;

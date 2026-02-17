@@ -12,12 +12,46 @@
   flex-wrap: wrap;
   gap: 1rem;
 
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+
   h1 {
     margin: 0;
     font-size: 1.75rem;
     font-weight: 600;
     color: #0f172a;
   }
+
+  .user-info {
+    font-size: 0.875rem;
+    color: #64748b;
+  }
+
+  .btn-logout {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8125rem;
+    color: #64748b;
+    background: transparent;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      color: #dc2626;
+      border-color: #fecaca;
+    }
+  }
+}
+
+.loading {
+  text-align: center;
+  color: #64748b;
+  padding: 2rem;
 }
 
 .btn-primary {

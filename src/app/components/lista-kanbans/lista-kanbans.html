@@ -1,11 +1,18 @@
 <div class="lista-kanbans">
   <header class="header">
-    <h1>Tableros Kanban</h1>
+    <div class="header-left">
+      <h1>Tableros Kanban</h1>
+      <span class="user-info">{{ auth.user()?.email }}</span>
+      <button type="button" class="btn-logout" (click)="auth.logout()">Cerrar sesión</button>
+    </div>
     <button type="button" class="btn-primary" (click)="openNewBoardForm()">
       + Nuevo tablero
     </button>
   </header>
 
+  @if (kanbanService.loading()) {
+    <p class="loading">Cargando tableros...</p>
+  } @else {
   <div class="board-grid">
     @for (board of boards(); track board.id) {
       <a [routerLink]="['/board', board.id]" class="board-card">
@@ -35,6 +42,7 @@
       </div>
     }
   </div>
+  }
 
   @if (showNewBoardForm()) {
     <div class="modal-overlay" (click)="closeNewBoardForm()">

@@ -1,21 +1,25 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import type { Task, TaskStatus } from '../models/task.model';
 import type { KanbanBoard, KanbanColumn } from '../models/kanban.model';
 import { DEFAULT_COLUMNS } from '../models/kanban.model';
+import { firstValueFrom } from 'rxjs';
 
-const STORAGE_KEY = 'kanban-app-data';
-
-interface StoredData {
-  boards: KanbanBoard[];
-}
+const API = '/api/boards';
 
 @Injectable({ providedIn: 'root' })
 export class KanbanService {
+  private readonly http = inject(HttpClient);
+
   private readonly boardsSignal = signal<KanbanBoard[]>([]);
   private readonly currentBoardIdSignal = signal<string | null>(null);
+  private readonly loadingSignal = signal(false);
+  private readonly errorSignal = signal<string | null>(null);
 
   readonly boards = this.boardsSignal.asReadonly();
   readonly currentBoardId = this.currentBoardIdSignal.asReadonly();
+  readonly loading = this.loadingSignal.asReadonly();
+  readonly error = this.errorSignal.asReadonly();
 
   readonly board = computed(() => {
     const id = this.currentBoardIdSignal();
@@ -25,89 +29,68 @@ export class KanbanService {
 
   readonly columns = computed(() => this.board()?.columns ?? []);
 
-  constructor() {
-    this.loadFromStorage();
-  }
-
   setCurrentBoard(id: string | null): void {
     this.currentBoardIdSignal.set(id);
   }
 
-  private loadFromStorage(): void {
+  clearError(): void {
+    this.errorSignal.set(null);
+  }
+
+  private hydrateBoard(b: KanbanBoard): KanbanBoard {
+    return {
+      ...b,
+      createdAt: new Date(b.createdAt),
+      updatedAt: new Date(b.updatedAt),
+      columns: (b.columns ?? []).map((col) => ({
+        ...col,
+        tasks: (col.tasks ?? []).map((t) => ({
+          ...t,
+          createdAt: new Date(t.createdAt),
+          updatedAt: new Date(t.updatedAt)
+        }))
+      }))
+    };
+  }
+
+  async loadBoards(): Promise<void> {
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
     try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        const data = JSON.parse(stored);
-        if (Array.isArray(data.boards)) {
-          this.boardsSignal.set(
-            data.boards.map((b: KanbanBoard) => this.hydrateBoard(b))
-          );
-        } else if (data.id && data.columns) {
-          this.boardsSignal.set([this.hydrateBoard(data as KanbanBoard)]);
-        }
-      }
-      if (this.boardsSignal().length === 0) {
-        this.createBoard('Mi tablero');
-      }
-    } catch {
-      this.createBoard('Mi tablero');
+      const res = await firstValueFrom(this.http.get<{ boards: KanbanBoard[] }>(API));
+      this.boardsSignal.set((res.boards ?? []).map((b) => this.hydrateBoard(b)));
+    } catch (err) {
+      this.errorSignal.set('Error al cargar tableros');
+      this.boardsSignal.set([]);
+    } finally {
+      this.loadingSignal.set(false);
     }
   }
 
-  private hydrateBoard(data: KanbanBoard): KanbanBoard {
-    const columns: KanbanColumn[] = DEFAULT_COLUMNS.map((col) => ({
-      ...col,
-      tasks: (data.columns?.find((c) => c.id === col.id)?.tasks ?? []).map((t) => ({
-        ...t,
-        createdAt: new Date(t.createdAt),
-        updatedAt: new Date(t.updatedAt)
-      }))
-    }));
-    return {
-      ...data,
-      createdAt: new Date(data.createdAt),
-      updatedAt: new Date(data.updatedAt),
-      columns
-    };
-  }
-
-  private saveToStorage(): void {
-    const boards = this.boardsSignal();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ boards }));
-  }
-
-  private updateBoard(boardId: string, updater: (board: KanbanBoard) => KanbanBoard): void {
-    this.boardsSignal.update((boards) =>
-      boards.map((b) => (b.id === boardId ? updater(b) : b))
+  private async persistBoard(board: KanbanBoard): Promise<void> {
+    await firstValueFrom(
+      this.http.put<KanbanBoard>(`${API}/${board.id}`, {
+        name: board.name,
+        columns: board.columns
+      })
     );
-    this.saveToStorage();
   }
 
-  createBoard(name: string): KanbanBoard {
-    const now = new Date();
-    const board: KanbanBoard = {
-      id: crypto.randomUUID(),
-      name,
-      createdAt: now,
-      updatedAt: now,
-      columns: DEFAULT_COLUMNS.map((col) => ({ ...col, tasks: [] }))
-    };
+  async createBoard(name: string): Promise<KanbanBoard> {
+    const res = await firstValueFrom(
+      this.http.post<KanbanBoard>(API, { name })
+    );
+    const board = this.hydrateBoard(res);
     this.boardsSignal.update((boards) => [...boards, board]);
-    this.saveToStorage();
     return board;
   }
 
-  deleteBoard(boardId: string): void {
+  async deleteBoard(boardId: string): Promise<void> {
+    await firstValueFrom(this.http.delete(`${API}/${boardId}`));
     this.boardsSignal.update((boards) => boards.filter((b) => b.id !== boardId));
     if (this.currentBoardIdSignal() === boardId) {
       this.currentBoardIdSignal.set(null);
     }
-    this.saveToStorage();
-  }
-
-  updateBoardName(boardId: string, name: string): void {
-    const now = new Date();
-    this.updateBoard(boardId, (b) => ({ ...b, name, updatedAt: now }));
   }
 
   addTask(
@@ -117,7 +100,8 @@ export class KanbanService {
     options?: { members?: string[]; estimatedHours?: Task['estimatedHours'] }
   ): Task | null {
     const boardId = this.currentBoardIdSignal();
-    if (!boardId) return null;
+    const board = this.board();
+    if (!boardId || !board) return null;
 
     const now = new Date();
     const task: Task = {
@@ -132,41 +116,46 @@ export class KanbanService {
       estimatedHours: options?.estimatedHours
     };
 
-    this.updateBoard(boardId, (board) => {
-      const columns = board.columns.map((col) =>
+    const updated: KanbanBoard = {
+      ...board,
+      columns: board.columns.map((col) =>
         col.id === status ? { ...col, tasks: [...col.tasks, task] } : col
-      );
-      return { ...board, columns, updatedAt: now };
-    });
+      ),
+      updatedAt: now
+    };
+    this.boardsSignal.update((boards) =>
+      boards.map((b) => (b.id === boardId ? updated : b))
+    );
+    this.persistBoard(updated).catch(() => this.errorSignal.set('Error al guardar'));
     return task;
   }
 
   updateTaskStatus(taskId: string, newStatus: TaskStatus): void {
     const boardId = this.currentBoardIdSignal();
-    if (!boardId) return;
+    const board = this.board();
+    if (!boardId || !board) return;
 
     const now = new Date();
-    this.updateBoard(boardId, (board) => {
-      let movedTask: Task | null = null;
-      const columnsAfterRemove = board.columns.map((col) => {
-        const taskIndex = col.tasks.findIndex((t) => t.id === taskId);
-        if (taskIndex >= 0) {
-          movedTask = { ...col.tasks[taskIndex], status: newStatus, updatedAt: now };
-          return { ...col, tasks: col.tasks.filter((_, i) => i !== taskIndex) };
-        }
-        return col;
-      });
-      if (movedTask) {
-        return {
-          ...board,
-          columns: columnsAfterRemove.map((col) =>
-            col.id === newStatus ? { ...col, tasks: [...col.tasks, movedTask!] } : col
-          ),
-          updatedAt: now
-        };
+    let movedTask: Task | null = null;
+    const columnsAfterRemove = board.columns.map((col) => {
+      const taskIndex = col.tasks.findIndex((t) => t.id === taskId);
+      if (taskIndex >= 0) {
+        movedTask = { ...col.tasks[taskIndex], status: newStatus, updatedAt: now };
+        return { ...col, tasks: col.tasks.filter((_, i) => i !== taskIndex) };
       }
-      return board;
+      return col;
     });
+    const updated: KanbanBoard = {
+      ...board,
+      columns: columnsAfterRemove.map((col) =>
+        col.id === newStatus ? { ...col, tasks: [...col.tasks, movedTask!] } : col
+      ),
+      updatedAt: now
+    };
+    this.boardsSignal.update((boards) =>
+      boards.map((b) => (b.id === boardId ? updated : b))
+    );
+    this.persistBoard(updated).catch(() => this.errorSignal.set('Error al guardar'));
   }
 
   updateTask(
@@ -174,54 +163,66 @@ export class KanbanService {
     updates: Partial<Pick<Task, 'title' | 'description' | 'priority' | 'members' | 'estimatedHours' | 'status'>>
   ): void {
     const boardId = this.currentBoardIdSignal();
-    if (!boardId) return;
+    const board = this.board();
+    if (!boardId || !board) return;
 
     const now = new Date();
     const newStatus = updates.status;
+    let updated: KanbanBoard;
 
-    this.updateBoard(boardId, (board) => {
-      if (newStatus) {
-        let movedTask: Task | null = null;
-        const columnsAfterRemove = board.columns.map((col) => {
-          const taskIndex = col.tasks.findIndex((t) => t.id === taskId);
-          if (taskIndex >= 0) {
-            movedTask = { ...col.tasks[taskIndex], ...updates, status: newStatus, updatedAt: now };
-            return { ...col, tasks: col.tasks.filter((_, i) => i !== taskIndex) };
-          }
-          return col;
-        });
-        if (movedTask) {
-          return {
-            ...board,
-            columns: columnsAfterRemove.map((col) =>
-              col.id === newStatus ? { ...col, tasks: [...col.tasks, movedTask!] } : col
-            ),
-            updatedAt: now
-          };
+    if (newStatus) {
+      let movedTask: Task | null = null;
+      const columnsAfterRemove = board.columns.map((col) => {
+        const taskIndex = col.tasks.findIndex((t) => t.id === taskId);
+        if (taskIndex >= 0) {
+          movedTask = { ...col.tasks[taskIndex], ...updates, status: newStatus, updatedAt: now };
+          return { ...col, tasks: col.tasks.filter((_, i) => i !== taskIndex) };
         }
-      }
-      const columns = board.columns.map((col) => ({
-        ...col,
-        tasks: col.tasks.map((t) =>
-          t.id === taskId ? { ...t, ...updates, updatedAt: now } : t
-        )
-      }));
-      return { ...board, columns, updatedAt: now };
-    });
+        return col;
+      });
+      updated = {
+        ...board,
+        columns: columnsAfterRemove.map((col) =>
+          col.id === newStatus ? { ...col, tasks: [...col.tasks, movedTask!] } : col
+        ),
+        updatedAt: now
+      };
+    } else {
+      updated = {
+        ...board,
+        columns: board.columns.map((col) => ({
+          ...col,
+          tasks: col.tasks.map((t) =>
+            t.id === taskId ? { ...t, ...updates, updatedAt: now } : t
+          )
+        })),
+        updatedAt: now
+      };
+    }
+    this.boardsSignal.update((boards) =>
+      boards.map((b) => (b.id === boardId ? updated : b))
+    );
+    this.persistBoard(updated).catch(() => this.errorSignal.set('Error al guardar'));
   }
 
   deleteTask(taskId: string): void {
     const boardId = this.currentBoardIdSignal();
-    if (!boardId) return;
+    const board = this.board();
+    if (!boardId || !board) return;
 
     const now = new Date();
-    this.updateBoard(boardId, (board) => {
-      const columns = board.columns.map((col) => ({
+    const updated: KanbanBoard = {
+      ...board,
+      columns: board.columns.map((col) => ({
         ...col,
         tasks: col.tasks.filter((t) => t.id !== taskId)
-      }));
-      return { ...board, columns, updatedAt: now };
-    });
+      })),
+      updatedAt: now
+    };
+    this.boardsSignal.update((boards) =>
+      boards.map((b) => (b.id === boardId ? updated : b))
+    );
+    this.persistBoard(updated).catch(() => this.errorSignal.set('Error al guardar'));
   }
 
   getTaskById(taskId: string): Task | undefined {

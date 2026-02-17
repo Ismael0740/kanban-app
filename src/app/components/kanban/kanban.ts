@@ -1,7 +1,7 @@
 import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
-import { ActivatedRoute } from '@angular/router';
+import { RouterLink, ActivatedRoute } from '@angular/router';
+import { AuthService } from '../../services/auth';
 import { KanbanService } from '../../services/kanban.service';
 import { Task } from '../task/task';
 import type { Task as TaskModel, TaskStatus, EstimatedHours } from '../../models/task.model';
@@ -15,6 +15,7 @@ import type { KanbanColumn } from '../../models/kanban.model';
   styleUrl: './kanban.scss'
 })
 export class Kanban implements OnInit, OnDestroy {
+  protected readonly auth = inject(AuthService);
   protected readonly kanbanService = inject(KanbanService);
   private readonly route = inject(ActivatedRoute);
   private routeSub: ReturnType<ActivatedRoute['paramMap']['subscribe']> | null = null;
@@ -22,6 +23,7 @@ export class Kanban implements OnInit, OnDestroy {
   readonly columns = this.kanbanService.columns;
 
   ngOnInit(): void {
+    this.kanbanService.loadBoards();
     this.routeSub = this.route.paramMap.subscribe((params) => {
       const id = params.get('id');
       this.kanbanService.setCurrentBoard(id);

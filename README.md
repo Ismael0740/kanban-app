@@ -12,10 +12,11 @@ Aplicación web para el seguimiento de tareas de equipos usando el método Kanba
 ### Fase 2 ✓
 - **Componente Lista-Kanbans**: Acceso a múltiples tableros Kanban, crear/eliminar tableros
 
-### Fase 3
-- Sistema de **usuarios** con autenticación por tokens
-- Base de datos para persistencia
+### Fase 3 ✓
+- Sistema de **usuarios** con autenticación por tokens JWT
+- Base de datos (JSON file) para persistencia en servidor
 - Sesión de usuario con sus propios kanbans y datos
+- Login, registro y cierre de sesión
 
 ---
 
@@ -32,9 +33,29 @@ git branch -M main
 git push -u origin main
 ```
 
+## Ejecución
+
+**Importante:** La app requiere el backend API para funcionar (Fase 3).
+
+1. Inicia el servidor API (en una terminal):
+   ```bash
+   npm run server
+   ```
+   O en modo desarrollo con recarga automática:
+   ```bash
+   npm run server:dev
+   ```
+
+2. Inicia Angular (en otra terminal):
+   ```bash
+   ng serve
+   ```
+
+El proxy de Angular redirige `/api` al backend en `http://localhost:3000`. Los datos se guardan en `server/data.json`.
+
 ## Development server
 
-Para iniciar el servidor de desarrollo local:
+Para iniciar solo el frontend (requiere backend en marcha):
 
 ```bash
 ng serve

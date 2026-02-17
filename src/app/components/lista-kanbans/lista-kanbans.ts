@@ -1,6 +1,7 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth';
 import { KanbanService } from '../../services/kanban.service';
 import type { KanbanBoard } from '../../models/kanban.model';
 
@@ -10,12 +11,17 @@ import type { KanbanBoard } from '../../models/kanban.model';
   templateUrl: './lista-kanbans.html',
   styleUrl: './lista-kanbans.scss'
 })
-export class ListaKanbans {
+export class ListaKanbans implements OnInit {
+  protected readonly auth = inject(AuthService);
   protected readonly kanbanService = inject(KanbanService);
   readonly showNewBoardForm = signal(false);
   newBoardNameValue = '';
 
   readonly boards = this.kanbanService.boards;
+
+  ngOnInit(): void {
+    this.kanbanService.loadBoards();
+  }
 
   openNewBoardForm(): void {
     this.newBoardNameValue = '';
@@ -26,18 +32,26 @@ export class ListaKanbans {
     this.showNewBoardForm.set(false);
   }
 
-  createBoard(): void {
+  async createBoard(): Promise<void> {
     const name = this.newBoardNameValue.trim();
     if (!name) return;
-    this.kanbanService.createBoard(name);
-    this.closeNewBoardForm();
+    try {
+      await this.kanbanService.createBoard(name);
+      this.closeNewBoardForm();
+    } catch {
+      // Error handled by service
+    }
   }
 
-  deleteBoard(event: Event, boardId: string): void {
+  async deleteBoard(event: Event, boardId: string): Promise<void> {
     event.preventDefault();
     event.stopPropagation();
     if (confirm('¿Eliminar este tablero? Se perderán todas sus tareas.')) {
-      this.kanbanService.deleteBoard(boardId);
+      try {
+        await this.kanbanService.deleteBoard(boardId);
+      } catch {
+        // Error handled by service
+      }
     }
   }
 
