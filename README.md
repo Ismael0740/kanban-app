@@ -4,13 +4,13 @@ Aplicación web para el seguimiento de tareas de equipos usando el método Kanba
 
 ## Roadmap del proyecto
 
-### Fase 1 (Actual)
-- **Componente Kanban**: Tablero con columnas (Backlog, En proceso, Bloqueado, Hecho, etc.) para crear y mover tareas
-- **Componente Task**: Tarjeta con detalles de cada tarea; se despliega al hacer clic en una tarea desde el tablero
+### Fase 1 ✓
+- **Componente Kanban**: Tablero con columnas (Backlog, En proceso, Bloqueado, Hecho) para crear y mover tareas
+- **Componente Task**: Tarjeta editable con detalles de cada tarea
 - Persistencia de datos en **localStorage**
 
-### Fase 2
-- **Componente Lista-Kanbans**: Acceso a múltiples tableros Kanban
+### Fase 2 ✓
+- **Componente Lista-Kanbans**: Acceso a múltiples tableros Kanban, crear/eliminar tableros
 
 ### Fase 3
 - Sistema de **usuarios** con autenticación por tokens

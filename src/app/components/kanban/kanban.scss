@@ -6,6 +6,21 @@
 
 .kanban-header {
   margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  .btn-back {
+    font-size: 0.875rem;
+    color: #64748b;
+    text-decoration: none;
+    align-self: flex-start;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #3b82f6;
+    }
+  }
 
   h1 {
     margin: 0;

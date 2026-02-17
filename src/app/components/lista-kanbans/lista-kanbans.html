@@ -1,0 +1,65 @@
+<div class="lista-kanbans">
+  <header class="header">
+    <h1>Tableros Kanban</h1>
+    <button type="button" class="btn-primary" (click)="openNewBoardForm()">
+      + Nuevo tablero
+    </button>
+  </header>
+
+  <div class="board-grid">
+    @for (board of boards(); track board.id) {
+      <a [routerLink]="['/board', board.id]" class="board-card">
+        <div class="board-card-header">
+          <h2>{{ board.name }}</h2>
+          <button
+            type="button"
+            class="btn-delete"
+            (click)="deleteBoard($event, board.id)"
+            title="Eliminar tablero"
+            aria-label="Eliminar tablero"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+        <p class="board-meta">{{ getTaskCount(board) }} tarea(s)</p>
+        <span class="board-link">Abrir →</span>
+      </a>
+    } @empty {
+      <div class="empty-state">
+        <p>No hay tableros todavía.</p>
+        <button type="button" class="btn-primary" (click)="openNewBoardForm()">
+          Crear el primero
+        </button>
+      </div>
+    }
+  </div>
+
+  @if (showNewBoardForm()) {
+    <div class="modal-overlay" (click)="closeNewBoardForm()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <h3>Nuevo tablero</h3>
+        <form (ngSubmit)="createBoard()">
+          <label>
+            Nombre del tablero
+            <input
+              type="text"
+              [(ngModel)]="newBoardNameValue"
+              name="boardName"
+              placeholder="Ej: Sprint 1, Proyecto X..."
+            />
+          </label>
+          <div class="modal-actions">
+            <button type="button" class="btn-secondary" (click)="closeNewBoardForm()">
+              Cancelar
+            </button>
+            <button type="submit" class="btn-primary" [disabled]="!newBoardNameValue.trim()">
+              Crear
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>

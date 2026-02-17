@@ -1,5 +1,7 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { KanbanService } from '../../services/kanban.service';
 import { Task } from '../task/task';
 import type { Task as TaskModel, TaskStatus, EstimatedHours } from '../../models/task.model';
@@ -8,14 +10,28 @@ import type { KanbanColumn } from '../../models/kanban.model';
 
 @Component({
   selector: 'app-kanban',
-  imports: [FormsModule, Task],
+  imports: [FormsModule, RouterLink, Task],
   templateUrl: './kanban.html',
   styleUrl: './kanban.scss'
 })
-export class Kanban {
+export class Kanban implements OnInit, OnDestroy {
   protected readonly kanbanService = inject(KanbanService);
+  private readonly route = inject(ActivatedRoute);
+  private routeSub: ReturnType<ActivatedRoute['paramMap']['subscribe']> | null = null;
 
   readonly columns = this.kanbanService.columns;
+
+  ngOnInit(): void {
+    this.routeSub = this.route.paramMap.subscribe((params) => {
+      const id = params.get('id');
+      this.kanbanService.setCurrentBoard(id);
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.routeSub?.unsubscribe();
+    this.kanbanService.setCurrentBoard(null);
+  }
   readonly selectedTask = signal<TaskModel | null>(null);
   readonly showNewTaskForm = signal(false);
   readonly newTaskColumn = signal<TaskStatus>('backlog');
