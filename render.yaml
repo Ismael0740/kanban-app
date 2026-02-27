@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: kanban-app
+    env: node
+
+    buildCommand: |
+      npm install
+      cd server && npm install && cd ..
+      npx ng build
+
+    startCommand: node server/index.js
+
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_SECRET
+        generateValue: true

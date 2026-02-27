@@ -22,6 +22,18 @@ Aplicación web para el seguimiento de tareas de equipos usando el método Kanba
 
 Proyecto generado con [Angular CLI](https://github.com/angular/angular-cli) v21.1.3.
 
+## Despliegue en la nube (para demos)
+
+Para acceder desde otro ordenador sin instalar Node ni clonar el repo, despliega en **Render** o **Railway**. Ver [DEPLOY.md](DEPLOY.md) para la guía completa.
+
+Resumen rápido (Render):
+1. Sube el código a GitHub
+2. Crea un Web Service en [Render](https://render.com) conectando tu repo
+3. Build: `npm install && cd server && npm install && cd .. && npx ng build`
+4. Start: `node server/index.js`
+5. Añade `NODE_ENV=production` y `JWT_SECRET` en variables de entorno
+6. Obtendrás una URL pública (ej: `https://kanban-app-xxx.onrender.com`)
+
 ## Subir a GitHub
 
 1. Crea un nuevo repositorio en [GitHub](https://github.com/new) (sin README ni .gitignore, el proyecto ya los incluye)

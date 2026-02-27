@@ -1,15 +1,23 @@
 import express from 'express';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import { randomUUID } from 'crypto';
 import * as db from './db.js';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const isProduction = process.env.NODE_ENV === 'production';
+
 const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'kanban-dev-secret-change-in-production';
 
-app.use(cors({ origin: 'http://localhost:4200', credentials: true }));
+const corsOptions = isProduction
+  ? { origin: true, credentials: true }
+  : { origin: 'http://localhost:4200', credentials: true };
+app.use(cors(corsOptions));
 app.use(express.json());
 
 const authMiddleware = (req, res, next) => {
@@ -126,6 +134,14 @@ app.delete('/api/boards/:id', authMiddleware, (req, res) => {
   }
   res.status(204).send();
 });
+
+if (isProduction) {
+  const staticPath = path.join(__dirname, '..', 'dist', 'kanban-app', 'browser');
+  app.use(express.static(staticPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(staticPath, 'index.html'));
+  });
+}
 
 app.listen(PORT, () => {
   console.log(`API Kanban escuchando en http://localhost:${PORT}`);
