@@ -14,10 +14,10 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'kanban-dev-secret-change-in-production';
 
-const corsOptions = isProduction
-  ? { origin: true, credentials: true }
-  : { origin: 'http://localhost:4200', credentials: true };
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
 app.use(express.json());
 
 const authMiddleware = (req, res, next) => {
@@ -143,6 +143,6 @@ if (isProduction) {
   });
 }
 
-app.listen(PORT, () => {
-  console.log(`API Kanban escuchando en http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`API Kanban escuchando en puerto ${PORT}`);
 });
