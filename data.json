@@ -1,0 +1,11 @@
+{
+  "users": [
+    {
+      "id": "f67708cf-13ac-4422-9dfd-0aab4ab14f4f",
+      "email": "apinedoolivan@gmail.com",
+      "passwordHash": "$2a$10$RrcOrJBcMxFPR3rOKyotTu648UcICd9nKjKUs8LWPXJYfEdLfdMB.",
+      "createdAt": "2026-02-17T10:42:59.366Z"
+    }
+  ],
+  "boards": []
+}
