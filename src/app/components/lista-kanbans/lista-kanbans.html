@@ -1,5 +1,5 @@
 <div class="lista-kanbans">
-  <header class="header">
+  <!-- <header class="header">
     <div class="header-left">
       <h1>Tableros Kanban</h1>
       <span class="user-info">{{ auth.user()?.email }}</span>
@@ -8,23 +8,50 @@
     <button type="button" class="btn-primary" (click)="openNewBoardForm()">
       + Nuevo tablero
     </button>
+  </header> -->
+  
+  <header class="header">
+    <div class="header-left">
+      <h1>Tableros Kanban</h1>
+    </div>
+    <div class="header-right">
+      <button type="button" class="btn-primary" (click)="openNewBoardForm()">
+        <span class="material-symbols-outlined">
+          dashboard_customize
+        </span> Nuevo tablero
+      </button>
+      <div class="user-menu" (click)="toggleMenu()" tabindex="0">
+        <span class="user-name">
+          <span class="material-symbols-outlined">account_circle</span>
+          {{ auth.user()?.email }} 
+          <span class="material-symbols-outlined">keyboard_arrow_down</span>
+        </span>
+        
+        <div class="dropdown" *ngIf="menuOpen" (click)="$event.stopPropagation()">
+          <button (click)="logout()">
+            <span class="material-symbols-outlined">logout</span>
+            Cerrar sesión
+          </button>
+        </div>
+      </div>
+    </div>
   </header>
-
+  
   @if (kanbanService.loading()) {
     <p class="loading">Cargando tableros...</p>
   } @else {
-  <div class="board-grid">
-    @for (board of boards(); track board.id) {
-      <a [routerLink]="['/board', board.id]" class="board-card">
-        <div class="board-card-header">
-          <h2>{{ board.name }}</h2>
-          <button
+    <div class="board-grid">
+      @for (board of boards(); track board.id) {
+        <a [routerLink]="['/board', board.id]" class="board-card">
+          <div class="board-card-header">
+            <h2>{{ board.name }}</h2>
+            <button
             type="button"
             class="btn-delete"
             (click)="deleteBoard($event, board.id)"
             title="Eliminar tablero"
             aria-label="Eliminar tablero"
-          >
+            >
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 6L6 18M6 6l12 12"/>
             </svg>
@@ -42,32 +69,32 @@
       </div>
     }
   </div>
-  }
+}
 
-  @if (showNewBoardForm()) {
-    <div class="modal-overlay" (click)="closeNewBoardForm()">
-      <div class="modal" (click)="$event.stopPropagation()">
-        <h3>Nuevo tablero</h3>
-        <form (ngSubmit)="createBoard()">
-          <label>
-            Nombre del tablero
-            <input
-              type="text"
-              [(ngModel)]="newBoardNameValue"
-              name="boardName"
-              placeholder="Ej: Sprint 1, Proyecto X..."
-            />
-          </label>
-          <div class="modal-actions">
-            <button type="button" class="btn-secondary" (click)="closeNewBoardForm()">
-              Cancelar
-            </button>
-            <button type="submit" class="btn-primary" [disabled]="!newBoardNameValue.trim()">
-              Crear
-            </button>
-          </div>
-        </form>
-      </div>
+@if (showNewBoardForm()) {
+  <div class="modal-overlay" (click)="closeNewBoardForm()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <h3>Nuevo tablero</h3>
+      <form (ngSubmit)="createBoard()">
+        <label>
+          Nombre del tablero
+          <input
+          type="text"
+          [(ngModel)]="newBoardNameValue"
+          name="boardName"
+          placeholder="Ej: Sprint 1, Proyecto X..."
+          />
+        </label>
+        <div class="modal-actions">
+          <button type="button" class="btn-secondary" (click)="closeNewBoardForm()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="!newBoardNameValue.trim()">
+            Crear
+          </button>
+        </div>
+      </form>
     </div>
-  }
+  </div>
+}
 </div>
