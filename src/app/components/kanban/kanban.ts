@@ -1,6 +1,6 @@
-import { Component, signal, inject, OnInit, OnDestroy, HostListener } from '@angular/core';
+import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { KanbanService } from '../../services/kanban.service';
 import { Task } from '../task/task';
@@ -10,7 +10,7 @@ import type { KanbanColumn } from '../../models/kanban.model';
 
 @Component({
   selector: 'app-kanban',
-  imports: [FormsModule, RouterLink, Task],
+  imports: [FormsModule, Task],
   templateUrl: './kanban.html',
   styleUrl: './kanban.scss'
 })
@@ -21,32 +21,6 @@ export class Kanban implements OnInit, OnDestroy {
   private routeSub: ReturnType<ActivatedRoute['paramMap']['subscribe']> | null = null;
 
   readonly columns = this.kanbanService.columns;
-
-  /* -----------------------------
-     Dropdown de usuario
-  ----------------------------- */
-  menuOpen = false;
-
-  toggleMenu(): void {
-    this.menuOpen = !this.menuOpen;
-  }
-
-  @HostListener('document:click', ['$event'])
-  closeMenu(event: Event): void {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.user-menu')) {
-      this.menuOpen = false;
-    }
-  }
-
-  logout(): void {
-    this.menuOpen = false;
-    this.auth.logout();
-  }
-
-  /* -----------------------------
-     Lógica original del Kanban
-  ----------------------------- */
 
   ngOnInit(): void {
     this.kanbanService.loadBoards();

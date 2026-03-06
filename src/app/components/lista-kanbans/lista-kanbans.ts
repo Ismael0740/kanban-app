@@ -1,4 +1,4 @@
-import { Component, inject, signal, OnInit, HostListener } from '@angular/core';
+import { Component, inject, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
@@ -20,28 +20,6 @@ export class ListaKanbans implements OnInit {
   readonly showNewBoardForm = signal(false);
   newBoardNameValue = '';
   readonly boards = this.kanbanService.boards;
-
-  // Dropdown
-  menuOpen = false;
-
-  toggleMenu() {
-    this.menuOpen = !this.menuOpen;
-  }
-
-  @HostListener('document:click', ['$event'])
-  closeMenu(event: Event) {
-    const target = event.target as HTMLElement;
-    if (!target.closest('.user-menu')) {
-      this.menuOpen = false;
-    }
-  }
-
-  logout() {
-    this.menuOpen = false;
-    this.auth.logout();
-  }
-
-  // Resto lógica
   ngOnInit(): void {
     this.kanbanService.loadBoards();
   }

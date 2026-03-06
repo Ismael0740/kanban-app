@@ -1,102 +1,78 @@
 
 
 <div class="kanban">    
-  <nav>
-    <a routerLink="/" class="btn-back" title="Volver a tableros">← Volver</a>
-  </nav>
-<div class="container">
-    <!-- <header class="kanban-header">
-    <div class="header-top">
-      <a routerLink="/" class="btn-back" title="Volver a tableros">← Tableros</a>
-      <span class="user-info">{{ auth.user()?.email }}</span>
-      <button type="button" class="btn-logout" (click)="auth.logout()">Cerrar sesión</button>
-    </div>
-    <h1>{{ kanbanService.board()?.name ?? 'Tablero Kanban' }}</h1>
-  </header> -->
-  
-  <header>
-    <div class="header-left">
-      <h1>{{ kanbanService.board()?.name ?? 'Tablero Kanban' }}</h1>      
-    </div>
-    <div class="header-right">
-      <div class="user-menu" (click)="toggleMenu()" tabindex="0">
-        <span class="user-name">
-          <span class="material-symbols-outlined">account_circle</span>
-          {{ auth.user()?.email }}
-          <span class="material-symbols-outlined">keyboard_arrow_down</span>
-        </span>
-        
-        @if (menuOpen) {
-          <div class="dropdown" (click)="$event.stopPropagation()">
-            <button (click)="logout()">
-              <span class="material-symbols-outlined">logout</span>
-              Cerrar sesión
-            </button>
-          </div>
-        }
-      </div>
-    </div>
-  </header>
-  
-  
-  
-  <div class="board">
-    @for (column of columns(); track column.id) {
-      <section
-      class="column"
-      [class]="'column-' + column.id"
-      (drop)="onDrop($event, column.id)"
-      (dragover)="onDragOver($event)"
-      >
-      <div class="column-header">
-        <h2>{{ column.title }}</h2>
-        <button
-        type="button"
-        class="btn-add"
-        (click)="openNewTaskForm(column.id)"
-        title="Añadir tarea"
+  <div class="container">
+    <header>
+      <div class="header-left">
+        <h1>{{ kanbanService.board()?.name ?? 'Tablero Kanban' }}</h1>      
+      </div>    
+    </header>
+    
+    
+    
+    <div class="board">
+      @for (column of columns(); track column.id) {
+        <section
+        class="column"
+        [class]="'column-' + column.id"
+        (drop)="onDrop($event, column.id)"
+        (dragover)="onDragOver($event)"
         >
-        + Añadir
-      </button>
-    </div>
-    <ul class="task-list">
-      @for (task of column.tasks; track task.id) {
-        <li
-        class="task-item"
-        draggable="true"
-        (dragstart)="onDragStart($event, task)"
-        (click)="selectTask(task)"
-        >
-        <div class="task-item-header">
-          <span class="task-title">{{ task.title }}</span>
+        <div class="column-header">
+          <h2>{{ column.title }}</h2>
           <button
           type="button"
-          class="btn-delete"
-          (click)="deleteTask($event, task.id)"
-          title="Eliminar tarea"
-          aria-label="Eliminar tarea"
+          class="btn-add"
+          (click)="openNewTaskForm(column.id)"
+          title="Añadir tarea"
           >
-          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
+          <span class="material-symbols-outlined">
+            add
+          </span>
         </button>
       </div>
-      @if (task.description) {
-        <span class="task-preview">{{ task.description.length > 60 ? task.description.slice(0, 60) + '...' : task.description }}</span>
+      <div class="tasks">
+        <ul class="task-list">
+          @for (task of column.tasks; track task.id) {
+            <li
+            class="task-item"
+            draggable="true"
+            (dragstart)="onDragStart($event, task)"
+            (click)="selectTask(task)"
+            >
+            <div class="task-item-header">
+              <span class="task-title">{{ task.title }}</span>
+              <button
+              type="button"
+              class="btn-delete"
+              (click)="deleteTask($event, task.id)"
+              title="Eliminar tarea"
+              aria-label="Eliminar tarea"
+              >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+          @if (task.description) {
+            <span class="task-preview">{{ task.description.length > 60 ? task.description.slice(0, 60) + '...' : task.description }}</span>
+          }
+          <div class="task-item-meta">
+            @if (task.estimatedHours) {
+              <span class="badge-hours">{{ task.estimatedHours }}h</span>
+            }
+            @if (task.members?.length) {
+              <span class="badge-members">{{ task.members!.length }} miembro(s)</span>
+            }
+          </div>
+        </li>
+      } @empty {
+        <li class="empty-hint">Arrastra tareas aquí o haz clic en "<span class="material-symbols-outlined">
+add
+</span>" para crear una nueva.</li>
       }
-      <div class="task-item-meta">
-        @if (task.estimatedHours) {
-          <span class="badge-hours">{{ task.estimatedHours }}h</span>
-        }
-        @if (task.members?.length) {
-          <span class="badge-members">{{ task.members!.length }} miembro(s)</span>
-        }
-      </div>
-    </li>
-  } @empty {
-    <li class="empty-hint">Arrastra tareas aquí o haz clic en "Añadir"</li>
-  }
-</ul>
+    </ul>
+  </div>
 </section>
 }
 </div>
