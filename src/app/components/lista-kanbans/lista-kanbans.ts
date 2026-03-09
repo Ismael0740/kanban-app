@@ -1,4 +1,5 @@
 import { Component, inject, signal, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth';
@@ -7,18 +8,18 @@ import type { KanbanBoard } from '../../models/kanban.model';
 
 @Component({
   selector: 'app-lista-kanbans',
-  imports: [FormsModule, RouterLink],
+  standalone: true,
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './lista-kanbans.html',
   styleUrl: './lista-kanbans.scss'
 })
 export class ListaKanbans implements OnInit {
   protected readonly auth = inject(AuthService);
   protected readonly kanbanService = inject(KanbanService);
+
   readonly showNewBoardForm = signal(false);
   newBoardNameValue = '';
-
   readonly boards = this.kanbanService.boards;
-
   ngOnInit(): void {
     this.kanbanService.loadBoards();
   }
@@ -38,9 +39,7 @@ export class ListaKanbans implements OnInit {
     try {
       await this.kanbanService.createBoard(name);
       this.closeNewBoardForm();
-    } catch {
-      // Error handled by service
-    }
+    } catch {}
   }
 
   async deleteBoard(event: Event, boardId: string): Promise<void> {
@@ -49,9 +48,7 @@ export class ListaKanbans implements OnInit {
     if (confirm('¿Eliminar este tablero? Se perderán todas sus tareas.')) {
       try {
         await this.kanbanService.deleteBoard(boardId);
-      } catch {
-        // Error handled by service
-      }
+      } catch {}
     }
   }
 

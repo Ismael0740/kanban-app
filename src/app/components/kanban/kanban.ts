@@ -1,6 +1,6 @@
 import { Component, signal, inject, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { AuthService } from '../../services/auth';
 import { KanbanService } from '../../services/kanban.service';
 import { Task } from '../task/task';
@@ -10,7 +10,7 @@ import type { KanbanColumn } from '../../models/kanban.model';
 
 @Component({
   selector: 'app-kanban',
-  imports: [FormsModule, RouterLink, Task],
+  imports: [FormsModule, Task],
   templateUrl: './kanban.html',
   styleUrl: './kanban.scss'
 })
@@ -34,6 +34,7 @@ export class Kanban implements OnInit, OnDestroy {
     this.routeSub?.unsubscribe();
     this.kanbanService.setCurrentBoard(null);
   }
+
   readonly selectedTask = signal<TaskModel | null>(null);
   readonly showNewTaskForm = signal(false);
   readonly newTaskColumn = signal<TaskStatus>('backlog');
@@ -69,19 +70,28 @@ export class Kanban implements OnInit, OnDestroy {
   createTask(): void {
     const title = this.newTitle().trim();
     if (!title) return;
+
     const membersStr = this.newMembers().trim();
     const members = membersStr
       ? membersStr.split(',').map((m) => m.trim()).filter(Boolean)
       : [];
+
     const estimatedHours = this.newEstimatedHours();
     const validHours =
       typeof estimatedHours === 'number' && ESTIMATED_HOURS_OPTIONS.includes(estimatedHours as EstimatedHours)
         ? (estimatedHours as EstimatedHours)
         : undefined;
-    this.kanbanService.addTask(title, this.newDescription().trim(), this.newTaskColumn(), {
-      members: members.length ? members : undefined,
-      estimatedHours: validHours
-    });
+
+    this.kanbanService.addTask(
+      title,
+      this.newDescription().trim(),
+      this.newTaskColumn(),
+      {
+        members: members.length ? members : undefined,
+        estimatedHours: validHours
+      }
+    );
+
     this.closeNewTaskForm();
   }
 
