@@ -49,6 +49,7 @@ Desarrollada con **Angular 21** como proyecto práctico del curso de **SCRUM Mas
 npm install
 cd server && npm install && cd ..
 ```
+Recupera todas dependencias y modulos de node
 
 ### 2. Iniciar el servidor API
 
@@ -75,41 +76,18 @@ Abre el navegador en [http://localhost:4200/](http://localhost:4200/). La aplica
 
 ## ☁️ Despliegue en la nube
 
-Para acceder desde otro equipo sin instalar Node ni clonar el repositorio, despliega en **Render** o **Railway**.  
-Consulta [`DEPLOY.md`](./DEPLOY.md) para la guía completa.
+Para que la aplicación fuera accesible desde cualquier equipo sin necesidad de instalar Node ni clonar el repositorio, desplegamos la app en **Render**, una plataforma cloud que permite publicar aplicaciones web de forma sencilla conectándola directamente a un repositorio de GitHub. Render se encarga de ejecutar el build, levantar el servidor y mantener el servicio activo bajo una URL pública, sin necesidad de gestionar infraestructura.
 
-### Resumen rápido (Render)
+### Rama de despliegue: `render`
 
-1. Sube el código a GitHub.
-2. Crea un **Web Service** en Render conectando tu repositorio.
-3. Configura los comandos:
-   - **Build:** `npm install && cd server && npm install && cd .. && npx ng build`
-   - **Start:** `node server/index.js`
-4. Añade las variables de entorno:
-   - `NODE_ENV=production`
-   - `JWT_SECRET=<tu_secreto>`
-5. Obtendrás una URL pública (ej: `https://kanban-app-xxx.onrender.com`).
+El proyecto cuenta con una rama dedicada llamada `render`, separada de `main`, que contiene la configuración específica para que el despliegue funcione correctamente en este entorno. En ella se ajustan los comandos de build y arranque del servidor, así como las variables de entorno necesarias (`NODE_ENV=production` y `JWT_SECRET`). De esta forma, la rama principal se mantiene limpia para el desarrollo y la rama `render` refleja en todo momento el estado desplegado en producción.
 
----
+🌐 **Demo desplegada:** [https://kanban-app-two-ochre.vercel.app/](https://kanban-app-two-ochre.vercel.app/)
 
-## 📤 Subir a GitHub
-
-```bash
-# Crea un nuevo repositorio en GitHub (sin README ni .gitignore, el proyecto ya los incluye)
-git remote add origin https://github.com/TU_USUARIO/kanban-app.git
-git branch -M main
-git push -u origin main
-```
-
+> Para más detalles sobre la configuración del despliegue, consulta [`DEPLOY.md`](./DEPLOY.md).
 ---
 
 ## 🛠️ Comandos Angular CLI
-
-### Generar componentes
-
-```bash
-ng generate component nombre-componente
-```
 
 Para ver todos los esquemas disponibles (componentes, directivas, pipes...):
 
