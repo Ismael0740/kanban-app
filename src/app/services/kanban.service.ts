@@ -4,8 +4,9 @@ import type { Task, TaskStatus } from '../models/task.model';
 import type { KanbanBoard, KanbanColumn } from '../models/kanban.model';
 import { DEFAULT_COLUMNS } from '../models/kanban.model';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
-const API = '/api/boards';
+const API = `${environment.apiBaseUrl}/api/boards`;
 
 @Injectable({ providedIn: 'root' })
 export class KanbanService {

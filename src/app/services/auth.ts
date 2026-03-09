@@ -2,6 +2,7 @@ import { Injectable, signal, computed, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 const TOKEN_KEY = 'kanban-token';
 const USER_KEY = 'kanban-user';
@@ -70,7 +71,7 @@ export class AuthService {
 
   async register(email: string, password: string): Promise<AuthResponse> {
     const res = await firstValueFrom(
-      this.http.post<AuthResponse>('/api/auth/register', { email, password })
+      this.http.post<AuthResponse>(`${environment.apiBaseUrl}/api/auth/register`, { email, password })
     );
     this.saveSession(res.token, res.user);
     return res;
@@ -78,7 +79,7 @@ export class AuthService {
 
   async login(email: string, password: string): Promise<AuthResponse> {
     const res = await firstValueFrom(
-      this.http.post<AuthResponse>('/api/auth/login', { email, password })
+      this.http.post<AuthResponse>(`${environment.apiBaseUrl}/api/auth/login`, { email, password })
     );
     this.saveSession(res.token, res.user);
     return res;

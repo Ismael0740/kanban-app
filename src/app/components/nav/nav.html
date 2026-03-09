@@ -1,0 +1,28 @@
+<nav>
+  <div class="header-left">
+    @if (currentUrl() !== '/') {
+    <a routerLink="/" class="btn-back" title="Volver a tableros"><span class="material-symbols-outlined">
+arrow_back
+</span> Volver a trableros</a>
+  }
+  </div>
+
+  <div class="header-right">
+    <div class="user-menu" (click)="toggleMenu()" tabindex="0">
+      <span class="user-name">
+        <span class="material-symbols-outlined">account_circle</span>
+        {{ auth.user()?.email }}
+        <span class="material-symbols-outlined">keyboard_arrow_down</span>
+      </span>
+
+      @if (menuOpen()) {
+        <div class="dropdown" (click)="$event.stopPropagation()">
+          <button (click)="logout()">
+            <span class="material-symbols-outlined">logout</span>
+            Cerrar sesión
+          </button>
+        </div>
+      }
+    </div>
+  </div>
+</nav>
