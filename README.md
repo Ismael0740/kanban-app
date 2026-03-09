@@ -1,122 +1,158 @@
-# KanbanApp
+# 📋 KanbanApp
 
-Aplicación web para el seguimiento de tareas de equipos usando el método Kanban. Desarrollada con Angular 21.
+Aplicación web para el seguimiento de tareas de equipos usando el método **Kanban**.  
+Desarrollada con **Angular 21** como proyecto práctico del curso de **SCRUM Master**.
 
-## Roadmap del proyecto
-
-### Fase 1 ✓
-- **Componente Kanban**: Tablero con columnas (Backlog, En proceso, Bloqueado, Hecho) para crear y mover tareas
-- **Componente Task**: Tarjeta editable con detalles de cada tarea
-- Persistencia de datos en **localStorage**
-
-### Fase 2 ✓
-- **Componente Lista-Kanbans**: Acceso a múltiples tableros Kanban, crear/eliminar tableros
-
-### Fase 3 ✓
-- Sistema de **usuarios** con autenticación por tokens JWT
-- Base de datos (JSON file) para persistencia en servidor
-- Sesión de usuario con sus propios kanbans y datos
-- Login, registro y cierre de sesión
+🌐 **Demo en producción:** [https://kanban-app-two-ochre.vercel.app/](https://kanban-app-two-ochre.vercel.app/)
 
 ---
 
-Proyecto generado con [Angular CLI](https://github.com/angular/angular-cli) v21.1.3.
+## 👥 Equipo
 
-## Despliegue en la nube (para demos)
+| Nombre | Rol |
+|---|---|
+| **Ismael** | Scrum Master |
+| **Rocío** | UX/UI Designer |
+| **Alex** | Developer |
+| **Pablo Fernández** | Tester |
+| **Pablo Ramón** | Product Owner |
 
-Para acceder desde otro ordenador sin instalar Node ni clonar el repo, despliega en **Render** o **Railway**. Ver [DEPLOY.md](DEPLOY.md) para la guía completa.
+---
 
-Resumen rápido (Render):
-1. Sube el código a GitHub
-2. Crea un Web Service en [Render](https://render.com) conectando tu repo
-3. Build: `npm install && cd server && npm install && cd .. && npx ng build`
-4. Start: `node server/index.js`
-5. Añade `NODE_ENV=production` y `JWT_SECRET` en variables de entorno
-6. Obtendrás una URL pública (ej: `https://kanban-app-xxx.onrender.com`)
+## 🗺️ Roadmap del proyecto
 
-## Subir a GitHub
+### ✅ Fase 1
+- **Componente Kanban:** Tablero con columnas (*Backlog, En proceso, Bloqueado, Hecho*) para crear y mover tareas.
+- **Componente Task:** Tarjeta editable con los detalles de cada tarea.
+- Persistencia de datos en `localStorage`.
 
-1. Crea un nuevo repositorio en [GitHub](https://github.com/new) (sin README ni .gitignore, el proyecto ya los incluye)
-2. Conecta el repositorio local y sube el código:
+### ✅ Fase 2
+- **Componente Lista-Kanbans:** Acceso a múltiples tableros Kanban.
+- Crear y eliminar tableros.
+
+### ✅ Fase 3
+- Sistema de usuarios con autenticación por tokens **JWT**.
+- Base de datos (fichero JSON) para persistencia en servidor.
+- Sesión de usuario con sus propios kanbans y datos.
+- Login, registro y cierre de sesión.
+
+### ✅ Fase 4
+- **Diseño final:** Diseño completo con acabado profesional
+
+## 🚀 Ejecución local
+
+> **Importante:** La app requiere el backend API para funcionar (Fase 3).
+
+### 1. Instalar dependencias
 
 ```bash
-git remote add origin https://github.com/TU_USUARIO/kanban-app.git
-git branch -M main
-git push -u origin main
+npm install
+cd server && npm install && cd ..
 ```
 
-## Ejecución
+### 2. Iniciar el servidor API
 
-**Importante:** La app requiere el backend API para funcionar (Fase 3).
+```bash
+# Modo producción
+npm run server
 
-1. Inicia el servidor API (en una terminal):
-   ```bash
-   npm run server
-   ```
-   O en modo desarrollo con recarga automática:
-   ```bash
-   npm run server:dev
-   ```
+# Modo desarrollo con recarga automática
+npm run server:dev
+```
 
-2. Inicia Angular (en otra terminal):
-   ```bash
-   ng serve
-   ```
-
-El proxy de Angular redirige `/api` al backend en `http://localhost:3000`. Los datos se guardan en `server/data.json`.
-
-## Development server
-
-Para iniciar solo el frontend (requiere backend en marcha):
+### 3. Iniciar Angular (en otra terminal)
 
 ```bash
 ng serve
 ```
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Abre el navegador en [http://localhost:4200/](http://localhost:4200/). La aplicación se recargará automáticamente al modificar los archivos fuente.
 
-## Code scaffolding
+> El proxy de Angular redirige `/api` al backend en `http://localhost:3000`.  
+> Los datos se guardan en `server/data.json`.
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+---
+
+## ☁️ Despliegue en la nube
+
+Para acceder desde otro equipo sin instalar Node ni clonar el repositorio, despliega en **Render** o **Railway**.  
+Consulta [`DEPLOY.md`](./DEPLOY.md) para la guía completa.
+
+### Resumen rápido (Render)
+
+1. Sube el código a GitHub.
+2. Crea un **Web Service** en Render conectando tu repositorio.
+3. Configura los comandos:
+   - **Build:** `npm install && cd server && npm install && cd .. && npx ng build`
+   - **Start:** `node server/index.js`
+4. Añade las variables de entorno:
+   - `NODE_ENV=production`
+   - `JWT_SECRET=<tu_secreto>`
+5. Obtendrás una URL pública (ej: `https://kanban-app-xxx.onrender.com`).
+
+---
+
+## 📤 Subir a GitHub
 
 ```bash
-ng generate component component-name
+# Crea un nuevo repositorio en GitHub (sin README ni .gitignore, el proyecto ya los incluye)
+git remote add origin https://github.com/TU_USUARIO/kanban-app.git
+git branch -M main
+git push -u origin main
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+---
+
+## 🛠️ Comandos Angular CLI
+
+### Generar componentes
+
+```bash
+ng generate component nombre-componente
+```
+
+Para ver todos los esquemas disponibles (componentes, directivas, pipes...):
 
 ```bash
 ng generate --help
 ```
 
-## Building
-
-To build the project run:
+### Build
 
 ```bash
 ng build
 ```
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Compila el proyecto y almacena los artefactos en el directorio `dist/`. La build de producción optimiza la aplicación para rendimiento y velocidad.
 
-## Running unit tests
+---
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+## 🧪 Tests
+
+### Tests unitarios
+
+Los tests unitarios se ejecutan con **Vitest**:
 
 ```bash
 ng test
 ```
 
-## Running end-to-end tests
+### Tests end-to-end
 
-For end-to-end (e2e) testing, run:
+Los tests E2E se ejecutan con **Cypress**:
 
 ```bash
 ng e2e
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+---
 
-## Additional Resources
+## 📚 Recursos adicionales
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+- [Angular CLI — Overview y referencia de comandos](https://angular.dev/tools/cli)
+- [Documentación de Angular](https://angular.dev)
+- [Documentación de Cypress](https://docs.cypress.io)
+
+---
+
+> Proyecto generado con **Angular CLI v21.1.3**.
